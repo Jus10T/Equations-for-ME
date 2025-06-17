@@ -3,33 +3,10 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QHBoxLayout, QFrame, QListWidget, QListWidgetItem,
                              QStackedWidget, QLabel)
 
-class HomePage(QWidget):
-    def __init__(self):
-        super().__init__()
-        home_layout = QVBoxLayout()
-        home_layout.addWidget(QLabel("Home Page"))
-        self.setLayout(home_layout)
-
-class UnitSolverPage(QWidget):
-    def __init__(self):
-        super().__init__()
-        unit_layout = QVBoxLayout()
-        unit_layout.addWidget(QLabel("Unit Solver"))
-        self.setLayout(unit_layout)
-
-class ThermoPage(QWidget):
-    def __init__(self):
-        super().__init__()
-        thermo_layout = QVBoxLayout()
-        thermo_layout.addWidget(QLabel("Thermo"))
-        self.setLayout(thermo_layout)
-
-class BeamPage(QWidget):
-    def __init__(self):
-        super().__init__()
-        beam_layout = QVBoxLayout()
-        beam_layout.addWidget(QLabel("Beam Deflection Solver"))
-        self.setLayout(beam_layout)
+from pages.homepage import HomePage
+from pages.thermopage import ThermoPage
+from pages.unitspage import UnitSolverPage
+from pages.mechanicspage import MechanicsPage
 
 
 class MainWindow(QMainWindow):
@@ -37,17 +14,16 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setupUI()
         self.setup_Window()
-        self.sidelist.currentRowChanged.connect(self.switchPage)
-        self.sidelist.setCurrentRow(0)
+        
 
 
     def setup_Window(self):
          self.setGeometry(100,100,800,600)
          self.setWindowTitle("Equations For ME")
 
-        
-
-    
+         #sidebar page switching
+         self.sidelist.currentRowChanged.connect(self.switchPage)
+         self.sidelist.setCurrentRow(0)
 
     def setupUI(self):
          central_widget = QWidget()
@@ -78,7 +54,7 @@ class MainWindow(QMainWindow):
         sidebar_heading = QLabel("ME Tools")
         sidebar_layout.addWidget(sidebar_heading)
 
-        #sidebar list
+        #create sidebar list
         self.sidelist = QListWidget()        
         self.sidelist.addItem(QListWidgetItem("Home"))
         self.sidelist.addItem(QListWidgetItem("Unit Conversion"))
@@ -86,8 +62,7 @@ class MainWindow(QMainWindow):
         self.sidelist.addItem(QListWidgetItem("Beam Deflection Calculator"))
 
 
-
-
+        #add list to sidebar layout
         sidebar_layout.addWidget(self.sidelist)
 
 
@@ -100,7 +75,6 @@ class MainWindow(QMainWindow):
         self.main_content_stack = QStackedWidget()
 
         content_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        #content_frame.setStyleSheet("border: 1px solid gray;")
 
 
         #make main layout and add stack to it
@@ -111,13 +85,13 @@ class MainWindow(QMainWindow):
         self.homepage = HomePage()
         self.unitpage = UnitSolverPage()
         self.thermopage = ThermoPage()
-        self.beampage = BeamPage()
+        self.mechanicspage = MechanicsPage()
 
         #add pages to stack
         self.main_content_stack.addWidget(self.homepage)
         self.main_content_stack.addWidget(self.unitpage)
         self.main_content_stack.addWidget(self.thermopage)
-        self.main_content_stack.addWidget(self.beampage)
+        self.main_content_stack.addWidget(self.mechanicspage)
 
         return content_frame
 
