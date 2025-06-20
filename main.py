@@ -1,12 +1,14 @@
 import sys
+import os
+from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QIcon, QPixmap, QFont
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
-                            QHBoxLayout, QFrame, QListWidget, QListWidgetItem,
-                             QStackedWidget, QLabel)
+                            QHBoxLayout, QFrame, 
+                             QStackedWidget, QLabel, QPushButton)
 
-from pages.homepage import HomePage
 from pages.thermopage import ThermoPage
 from pages.unitspage import UnitSolverPage
-from pages.mechanicspage import MechanicsPage
+from pages.beampage import BeamPage
 
 
 class MainWindow(QMainWindow):
@@ -14,16 +16,15 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setupUI()
         self.setup_Window()
-        
 
+
+        
+    
 
     def setup_Window(self):
-         self.setGeometry(100,100,800,600)
-         self.setWindowTitle("Equations For ME")
+         self.setGeometry(100,100,1000,700)
+         self.setWindowTitle("Tools For ME")
 
-         #sidebar page switching
-         self.sidelist.currentRowChanged.connect(self.switchPage)
-         self.sidelist.setCurrentRow(0)
 
     def setupUI(self):
          central_widget = QWidget()
@@ -31,41 +32,146 @@ class MainWindow(QMainWindow):
 
          #main layout
          main_layout = QHBoxLayout(central_widget)
-         main_layout.setContentsMargins(10, 10, 10, 10)
+         main_layout.setContentsMargins(25, 25, 25, 25)
+         main_layout.setSpacing(15)
+
 
          #create sidebar and add to layout
-         sidebar_widget = self.create_sidebar()
-         main_layout.addWidget(sidebar_widget, stretch= 1)
-         self.sidelist.setMaximumWidth(250)
-         self.sidelist.setMaximumWidth(200)
+         self.sidebar_widget = self.create_sidebar()
+         main_layout.addWidget(self.sidebar_widget, stretch= 1)
+         
 
          #add content area to layout
-         main_content_widget = self.create_content_area()
-         main_layout.addWidget(main_content_widget, stretch= 4)
+         self.main_content_widget = self.create_content_area()
+         main_layout.addWidget(self.main_content_widget, stretch= 5)
+
+
+         #styling
+         self.setStyleSheet("""
+
+            
+            QLabel#sidebarHeadingtext {
+                font-family: 'Segoe UI';
+                font-size: 30px;
+                font-weight: bold;
+                border-radius: 5;
+                color: #6b6969;
+                                            
+        
+                            }
+        
+
+                            """)
+
+
     
 
     def create_sidebar(self):
+        #frame
         sidebar = QFrame()
         sidebar.setFrameStyle(QFrame.Shape.StyledPanel)
-        #sidebar layout
+        sidebar.setMaximumWidth(275)
+        sidebar.setMinimumWidth(270)
+        #sidebar V layout
         sidebar_layout = QVBoxLayout(sidebar)
+        sidebar_layout.setContentsMargins(5,5,5,5)
+        sidebar_layout.setSpacing(10)
 
-        #sidebar heading
-        sidebar_heading = QLabel("ME Tools")
-        sidebar_layout.addWidget(sidebar_heading)
+        #sidebar heading H layout
+        sidebar_heading_layout = QHBoxLayout()
+        sidebar_heading_layout.setContentsMargins(5, 10, 20, 0)
+        sidebar_heading_layout.setSpacing(15)
 
-        #create sidebar list
-        self.sidelist = QListWidget()        
-        self.sidelist.addItem(QListWidgetItem("Home"))
-        self.sidelist.addItem(QListWidgetItem("Unit Conversion"))
-        self.sidelist.addItem(QListWidgetItem("Thermodynamics"))
-        self.sidelist.addItem(QListWidgetItem("Beam Deflection Calculator"))
-
-
-        #add list to sidebar layout
-        sidebar_layout.addWidget(self.sidelist)
+        #side heading text
+        sidebar_heading_text = QLabel("Tools")
+        sidebar_heading_text.setObjectName("sidebarHeadingtext")
+        sidebar_heading_text.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        sidebar_heading_text.setMaximumHeight(40)
 
 
+        #heading pixmap
+        sidebar_icon = QLabel()
+        sidebar_icon.setPixmap(QPixmap("Equations-for-ME\gearcalc.ico"))
+
+        #add icon and text to horizontal
+        sidebar_heading_layout.addWidget(sidebar_icon)
+        sidebar_heading_layout.addWidget(sidebar_heading_text)
+        sidebar_heading_layout.addStretch()
+
+
+        #add H to V
+        sidebar_layout.addLayout(sidebar_heading_layout)
+
+
+        #add line
+        navline = QFrame()
+        navline.setFrameShape(QFrame.Shape.HLine)
+        navline.setLineWidth(0)
+        navline.setContentsMargins(0,25, 25, 0)
+        navline.setStyleSheet("""
+                              
+                              color: gray;
+                              background: qlineargradient(
+                                x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FF9122,   /* Left color */
+                                stop:1 #7B7A79    /* Right color */
+    );
+                              
+                              
+                              """)
+
+        sidebar_layout.addWidget(navline)
+        
+
+
+
+        #create sidebar buttons
+        self.unitbutton = QPushButton("- Units")
+        self.thermobutton  = QPushButton("- Thermodynamics")
+        self.beamsbutton = QPushButton("- Beams")
+
+        #button style    
+        buttons = [self.unitbutton, self.thermobutton, self.beamsbutton]
+
+        buttonstyle = """
+            QPushButton {
+            padding: 10px;
+            text-align: left;
+            font-size: 17px;
+            font-weight: oblique;
+            font-family: 'Segoe UI';
+            color: #969393;
+                }
+            
+
+
+            QPushButton:hover {
+                background-color: #f3893c;
+                color: 'white';
+                }
+
+        """
+
+        for button in buttons:
+            button.setStyleSheet(buttonstyle)
+
+
+        #add buttons to layout
+        sidebar_layout.addWidget(self.unitbutton)
+        sidebar_layout.addWidget(self.thermobutton)
+        sidebar_layout.addWidget(self.beamsbutton)
+
+        #connect buttons to page switching
+        self.unitbutton.clicked.connect(lambda: self.main_content_stack.setCurrentIndex(0))
+        self.thermobutton.clicked.connect(lambda: self.main_content_stack.setCurrentIndex(1))
+        self.beamsbutton.clicked.connect(lambda: self.main_content_stack.setCurrentIndex(2))
+
+        #add stretch after buttons
+        sidebar_layout.addStretch()
+
+
+
+    
         return sidebar
 
 
@@ -82,16 +188,14 @@ class MainWindow(QMainWindow):
         center_layout.addWidget(self.main_content_stack)
 
         #create pages
-        self.homepage = HomePage()
         self.unitpage = UnitSolverPage()
         self.thermopage = ThermoPage()
-        self.mechanicspage = MechanicsPage()
+        self.beampage = BeamPage()
 
         #add pages to stack
-        self.main_content_stack.addWidget(self.homepage)
         self.main_content_stack.addWidget(self.unitpage)
         self.main_content_stack.addWidget(self.thermopage)
-        self.main_content_stack.addWidget(self.mechanicspage)
+        self.main_content_stack.addWidget(self.beampage)
 
         return content_frame
 
@@ -103,7 +207,10 @@ class MainWindow(QMainWindow):
 
 
 def main():
-    app = QApplication(sys.argv)
+    app = QApplication([])
+   
+    app.setWindowIcon(QIcon(('Equations-for-ME\gearcalc.png')))
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

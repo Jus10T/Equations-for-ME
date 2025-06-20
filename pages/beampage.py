@@ -1,13 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame
 
-class UnitSolverPage(QWidget):
+class BeamPage(QWidget):
     def __init__(self):
         super().__init__()
-        self.setupUI()
-
-
-    def setupUI(self):
-
         #layout
         unit_layout = QVBoxLayout()
         self.setLayout(unit_layout)
@@ -15,7 +10,7 @@ class UnitSolverPage(QWidget):
         unit_layout.setSpacing(10)
 
         #heading
-        title = QLabel("Unit Conversion")
+        title = QLabel("Beam Deflection Calculator")
         title.setStyleSheet("font-size:37px; font-weight: bold;")
 
         line1 = QFrame()
@@ -27,4 +22,3 @@ class UnitSolverPage(QWidget):
         unit_layout.addWidget(title)
         unit_layout.addWidget(line1)
         unit_layout.addStretch()
-
