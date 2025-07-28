@@ -2,9 +2,9 @@ import numpy as np
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, QFrame, QDialogButtonBox,
                              QLineEdit, QHBoxLayout, QFormLayout, QPushButton, QDialog, QButtonGroup,
                              QTableWidget, QTableWidgetItem)
-from PyQt6.QtGui import QPainter, QPen, QBrush, QColor, QPolygonF
+from PyQt6.QtGui import QPainter, QPen, QBrush, QColor, QPolygonF, QIcon, QPixmap
 
-from PyQt6.QtCore import Qt, QPointF, QRectF, pyqtSignal
+from PyQt6.QtCore import Qt, QPointF, QRectF, pyqtSignal, QSize
 
 
 
@@ -30,91 +30,214 @@ class BeamPage(QWidget):
         #unit drop down
         self.beam_unit_drop = QComboBox()
         set_dropdown_style(self.beam_unit_drop)
-        self.beam_unit_drop.setFixedSize(250, 50)
+        self.beam_unit_drop.setFixedSize(250, 60)
+        self.beam_unit_drop.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         self.beam_unit_drop.setObjectName("beam_unit_drop")
         self.beam_unit_drop.addItems(["English", "Metric / SI"])
 
-        #info H layout
+        #info H layout (input + table)
         self.info_layout = QHBoxLayout()
 
-        #input buttons layout
+
+        #input layout
         input_layout = QVBoxLayout()
         
 
         #model setup form
-        model_setup_layout = QFormLayout()
+        model_setup_layout = QVBoxLayout()
+
+        #model header
+        model_header = QLabel("Beam Model:")
+        model_header.setObjectName("modelheader")
+        setLabelStyle(model_header)
+
 
         #length
-        self.length_label = QLabel("Length:")
+
+        length_layout = QHBoxLayout()
+
+        self.length_label = QLabel("Length")
         setLabelStyle(self.length_label)
         self.length_label.setObjectName("length_label")
+        self.length_label.setFixedSize(160, 50)
+        length_layout.addWidget(self.length_label)
 
         self.length_lineEdit = QLineEdit()
         set_lineEdit_style(self.length_lineEdit)
-        self.length_label.setObjectName("length_lineEdit")
+        self.length_lineEdit.setObjectName("length_lineEdit")
+        self.length_lineEdit.setMaximumWidth(300)
+        length_layout.addWidget(self.length_lineEdit)
 
-        model_setup_layout.addRow(self.length_label, self.length_lineEdit)
+        self.length_unit_label = QLabel()
+        setLabelStyle(self.length_unit_label)
+        length_layout.addWidget(self.length_unit_label)
+
+        length_layout.addStretch()
+
 
         #modulus
-        self.modulus_label = QLabel("Modulus of Elasticity:")
+
+        modulus_layout = QHBoxLayout()
+
+        self.modulus_label = QLabel("Modulus of Elasticity")
         setLabelStyle(self.modulus_label)
         self.modulus_label.setObjectName("modulus_label")
+        self.modulus_label.setFixedSize(160, 50)
+        modulus_layout.addWidget(self.modulus_label)
 
         self.modulus_lineEdit = QLineEdit()
         set_lineEdit_style(self.modulus_lineEdit)
         self.modulus_lineEdit.setObjectName("modulus_lineEdit")
+        self.modulus_lineEdit.setMaximumWidth(300)
+        modulus_layout.addWidget(self.modulus_lineEdit)
 
-        model_setup_layout.addRow(self.modulus_label, self.modulus_lineEdit)
+        self.modulus_unit_label = QLabel()
+        setLabelStyle(self.modulus_unit_label)
+        modulus_layout.addWidget(self.modulus_unit_label)
+
+        modulus_layout.addStretch()
+
 
         #inertia
-        self.inertia_label = QLabel("Moment of Inertia:")
+
+        inertia_layout = QHBoxLayout()
+
+        self.inertia_label = QLabel("Moment of Inertia")
         setLabelStyle(self.inertia_label)
         self.inertia_label.setObjectName("inertia_label")
+        self.inertia_label.setFixedSize(160, 50)
+        inertia_layout.addWidget(self.inertia_label)
 
         self.inertia_lineEdit = QLineEdit()
         set_lineEdit_style(self.inertia_lineEdit)
         self.inertia_lineEdit.setObjectName("inertia_lineEdit")
+        self.inertia_lineEdit.setMaximumWidth(300)
+        inertia_layout.addWidget(self.inertia_lineEdit)
 
-        model_setup_layout.addRow(self.inertia_label, self.inertia_lineEdit)
+        self.inertia_unit_label = QLabel()
+        setLabelStyle(self.inertia_unit_label)
+        inertia_layout.addWidget(self.inertia_unit_label)
+
+        inertia_layout.addStretch()
 
         #make button
         self.make_beam = QPushButton("MAKE")
+        self.make_beam.setObjectName("makeBeamButton")
+        self.make_beam.setMaximumSize(500, 50)
+        self.make_beam.setContentsMargins(0, 30, 0, 20)
         setButtonStyle(self.make_beam)
-        model_setup_layout.addRow(self.make_beam)
+
         self.make_beam.clicked.connect(self.create_beam_model)
 
-        # buttons
+        #add to form
+        model_setup_layout.addStretch(stretch=2)
+        model_setup_layout.addWidget(model_header)
+        model_setup_layout.addLayout(length_layout)
+        model_setup_layout.addLayout(modulus_layout)
+        model_setup_layout.addLayout(inertia_layout)
+        model_setup_layout.addSpacing(25)
+        model_setup_layout.addWidget(self.make_beam)
+        model_setup_layout.addStretch(stretch=1)
+        model_setup_layout.setSpacing(0)
+
+
+
+
+
+        # add butons
         buttons_vlayout = QVBoxLayout()
 
-        add_pinned_btn = QPushButton("pinned support")
+        #support layout
+        support_layout = QHBoxLayout()
+
+        #load layout
+        load_layout = QHBoxLayout()
+
+
+        add_label = QLabel("Add:")
+        setLabelStyle(add_label)
+        add_label.setObjectName("add_label")
+    
+        # Add horizontal line under the "Add:" label
+        add_separator = QFrame()
+        add_separator.setFrameShape(QFrame.Shape.HLine)
+        add_separator.setFrameShadow(QFrame.Shadow.Sunken)
+        add_separator.setMaximumHeight(2)
+        add_separator.setStyleSheet("background-color: #cccccc;")
+
+        supports_label = QLabel("Supports:")
+        setLabelStyle(supports_label)
+        supports_label.setObjectName("supports_label")
+        
+
+        add_pinned_btn = QPushButton()
+        add_pinned_btn.setObjectName("pinned_support_btn")
         setButtonStyle(add_pinned_btn)
-        buttons_vlayout.addWidget(add_pinned_btn)
+        add_pinned_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/pinnedicon.png")))
+        add_pinned_btn.setIconSize(QSize(60, 60))
+        add_pinned_btn.setMaximumWidth(200)
         add_pinned_btn.clicked.connect(self.open_pinned_support_dialog)
 
-        add_roller_btn = QPushButton("roller support")
+
+        add_roller_btn = QPushButton()
+        add_roller_btn.setObjectName("roller_support_btn")
         setButtonStyle(add_roller_btn)
-        buttons_vlayout.addWidget(add_roller_btn)
+        add_roller_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/rollericon.png")))
+        add_roller_btn.setIconSize(QSize(60, 60))
+        add_roller_btn.setMaximumWidth(200)
         add_roller_btn.clicked.connect(self.open_roller_support_dialog)
 
-        add_fixed_btn = QPushButton("fixed support")
+
+        add_fixed_btn = QPushButton()
+        add_fixed_btn.setObjectName("fixed_support_btn")
         setButtonStyle(add_fixed_btn)
-        buttons_vlayout.addWidget(add_fixed_btn)
+        add_fixed_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/fixedicon.png")))
+        add_fixed_btn.setIconSize(QSize(60, 60))
+        add_fixed_btn.setMaximumWidth(200)
         add_fixed_btn.clicked.connect(self.open_fixed_support_dialog)
 
+        loads_label = QLabel("Loads:")
+        setLabelStyle(loads_label)
+        loads_label.setObjectName("loads_label")
+
+
         add_point_btn = QPushButton("point load")
+        add_point_btn.setObjectName("point_load_btn")
         setButtonStyle(add_point_btn)
-        buttons_vlayout.addWidget(add_point_btn)
+        add_point_btn.setMaximumWidth(200)
         add_point_btn.clicked.connect(self.open_pointload_dialog)
 
+
         add_moment_btn = QPushButton("moment load")
+        add_moment_btn.setObjectName("moment_load_btn")
         setButtonStyle(add_moment_btn)
-        buttons_vlayout.addWidget(add_moment_btn)
+        add_moment_btn.setMaximumWidth(200)
         add_moment_btn.clicked.connect(self.open_momentload_dialog)
 
+
         add_dist_btn = QPushButton("distributed load")
+        add_dist_btn.setObjectName("distributed_load_btn")
         setButtonStyle(add_dist_btn)
-        buttons_vlayout.addWidget(add_dist_btn)
+        add_dist_btn.setMaximumWidth(200)
         add_dist_btn.clicked.connect(self.open_distload_dialog)
+
+        #add to support layout
+        support_layout.addWidget(add_pinned_btn)
+        support_layout.addWidget(add_roller_btn)
+        support_layout.addWidget(add_fixed_btn)
+
+        #add to load layout
+        load_layout.addWidget(add_point_btn)
+        load_layout.addWidget(add_moment_btn)
+        load_layout.addWidget(add_dist_btn)
+
+        #add to button layout
+        buttons_vlayout.addWidget(add_label)
+        buttons_vlayout.addWidget(add_separator)
+        buttons_vlayout.addWidget(supports_label)
+        buttons_vlayout.addLayout(support_layout)
+        buttons_vlayout.addWidget(loads_label)
+        buttons_vlayout.addLayout(load_layout)
 
         #add to input layout
         input_layout.addLayout(model_setup_layout)
@@ -130,15 +253,18 @@ class BeamPage(QWidget):
 
         self.beam_unit_drop.currentTextChanged.connect(self.update_beam_labels)
         self.update_beam_labels(self.beam_unit_drop.currentText())
+        
+        # Initialize empty beam table
+        self.create_empty_beam_table()
 
     def update_beam_labels(self, system):
         units = beam_dropdown_units[system]
         length_unit = list(units['Length'].values())[0]
         modulus_unit = list(units['Elastic Modulus'].values())[0]
         inertia_unit = list(units['Moment of Inertia'].values())[0]
-        self.length_label.setText(f"Length  [{length_unit}]:")
-        self.modulus_label.setText(f"Modulus of Elasticity  [{modulus_unit}]:")
-        self.inertia_label.setText(f"Moment of Inertia  [{inertia_unit}]:")
+        self.length_unit_label.setText(f"[ {length_unit} ]")
+        self.modulus_unit_label.setText(f"[ {modulus_unit} ]")
+        self.inertia_unit_label.setText(f"[ {inertia_unit} ]")
 
     def open_pinned_support_dialog(self):
         unit_system = self.beam_unit_drop.currentText()
@@ -181,17 +307,33 @@ class BeamPage(QWidget):
         dialog.setupUI()
         dialog.exec()
 
-    def make_beam_table(self):
-        # Remove old table if it exists
-        if hasattr(self, 'beam_table'):
-            self.info_layout.removeWidget(self.beam_table)
-            self.beam_table.deleteLater()
-            del self.beam_table
-            
+    def create_empty_beam_table(self):
+        """Create an empty beam table that shows when the page loads"""
         self.beam_table = QTableWidget()
         self.beam_table.setColumnCount(4)
         self.beam_table.setHorizontalHeaderLabels(['Location', 'Support', 'Load', 'Magnitude'])
         self.beam_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.beam_table.setRowCount(0)  # Start with no rows
+        self.beam_table.setMinimumHeight(100)  # Give it some minimum height
+        self.beam_table.setStyleSheet("""
+            QTableWidget {
+                background-color: #f8f9fa;
+                gridline-color: #dee2e6;
+                border: 1px solid #dee2e6;
+            }
+            QTableWidget::item {
+                padding: 5px;
+            }
+        """)
+        self.info_layout.addWidget(self.beam_table)
+
+    def make_beam_table(self):
+        """Update the beam table with current beam model data"""
+        # Clear existing table data
+        self.beam_table.setRowCount(0)
+        
+        if not hasattr(self, 'beam_model'):
+            return
 
         rows = []
 
@@ -223,8 +365,6 @@ class BeamPage(QWidget):
         for row_idx, row_data in enumerate(rows):
             for col_idx, value in enumerate(row_data):
                 self.beam_table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
-
-        self.info_layout.addWidget(self.beam_table)
 
     
     def create_beam_model(self):

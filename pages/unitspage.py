@@ -62,6 +62,7 @@ class UnitSolverPage(QWidget):
         input_box_Hlayout = QHBoxLayout()
 
         self.input_unit_box = QLineEdit()
+        self.input_unit_box.setPlaceholderText("0")
         self.input_unit_box.setFocus()
         self.input_unit_box.setObjectName("inputLineEdit")
         set_lineEdit_style(self.input_unit_box)
@@ -85,6 +86,7 @@ class UnitSolverPage(QWidget):
         result_box_Hlayout = QHBoxLayout()
 
         self.result_unit_box = QLineEdit()
+        self.result_unit_box.setPlaceholderText("0")
         self.result_unit_box.setFocus()
         self.result_unit_box.setReadOnly(True)
         set_lineEdit_style(self.result_unit_box)

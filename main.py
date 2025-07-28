@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
         self.update_sidebar_styles(0)
 
     def setup_Window(self):
-         self.setGeometry(100,100,1100,700)
+         self.setGeometry(25,25,1400,700)
          self.setWindowTitle("Tools For ME")
 
 
@@ -64,7 +64,6 @@ class MainWindow(QMainWindow):
 
             
             QLabel#sidebarHeadingtext {
-                
                 font-size: 30px;
                 border-radius: 5;
                 color: white;

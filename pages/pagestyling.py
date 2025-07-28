@@ -108,6 +108,23 @@ def set_lineEdit_style(widget):
         QLineEdit#inputLineEdit:hover, QLineEdit#inputLineEdit:focus {
             border-bottom: 1px solid #ff8c00;      
         }
+        QLineEdit#length_lineEdit {
+            padding: 10px;
+            font-size: 20px;
+            border-bottom: 1px solid #ff8c00;
+        }
+        QLineEdit#modulus_lineEdit {
+            padding: 10px;
+            font-size: 20px;
+            border-bottom: 1px solid #ff8c00;
+
+        }
+        QLineEdit#inertia_lineEdit {
+            padding: 10px;
+            font-size: 20px;
+            border-bottom: 1px solid #ff8c00;
+
+        }
     """
     widget.setStyleSheet(line_edit_style)
 
@@ -119,13 +136,21 @@ def setLabelStyle(widget):
             font-size: 15px;
         }
         QLabel#length_label {
-            font-size: 11px;
+            font-size: 14px;
         
         }
         
         QLabel#modulus_label {
-            font-size: 11px;
-            background-color: red;
+            font-size: 12px;
+
+
+        }
+        QLabel#inertia_label {
+            font-size: 12px;
+
+        }
+        QLabel#modelheader {
+            font-size: 17px;
         }
 
 
@@ -144,9 +169,51 @@ def setButtonStyle(widget):
         
         }
         QPushButton:checked {
-                border: 1px solid #ff8c00;
-            }
+            border: 1px solid #ff8c00;
+        }
 
+        QPushButton#makeBeamButton {
+            font-size: 15px;
+            background-color: #ff8c00;
+        }
+        QPushButton#makeBeamButton:hover {
+            font-size: 15px;
+            background-color: #ff8c00;
+            border: 1px solid white;
+        }
+
+
+        QPushButton#pinned_support_btn {
+            background-color: #ff8c00;
+            padding: 2px;
+        }
+        QPushButton#pinned_support_btn:hover {
+            font-size: 15px;
+            background-color: #ff8c00;
+            border: 1px solid white;
+        }
+
+
+        QPushButton#roller_support_btn {
+            background-color: #ff8c00;
+            padding: 2px;
+        }
+        QPushButton#roller_support_btn:hover {
+            font-size: 15px;
+            background-color: #ff8c00;
+            border: 1px solid white;
+        }
+
+        
+        QPushButton#fixed_support_btn {
+            background-color: #ff8c00;
+            padding: 2px;
+        }
+        QPushButton#fixed_support_btn:hover {
+            font-size: 15px;
+            background-color: #ff8c00;
+            border: 1px solid white;
+        }
 
 """
     widget.setStyleSheet(button_style)
