@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
         self.update_sidebar_styles(0)
 
     def setup_Window(self):
-         self.setGeometry(25,25,1400,700)
+         self.setGeometry(50,50,1400,700)
          self.setWindowTitle("Tools For ME")
 
 
@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
 
         #heading pixmap
         sidebar_icon = QLabel()
-        sidebar_icon.setPixmap(QPixmap("Equations-for-ME\icons\gearcalc.ico"))
+        sidebar_icon.setPixmap(QPixmap("Equations-for-ME/icons/gearcalc.ico"))
 
         #add icon and text to horizontal
         sidebar_heading_layout.addWidget(sidebar_icon)
@@ -223,7 +223,7 @@ class MainWindow(QMainWindow):
 def main():
     app = QApplication([])
    
-    app.setWindowIcon(QIcon(('Equations-for-ME\icons\gearcalc.png')))
+    app.setWindowIcon(QIcon(('Equations-for-ME/icons/gearcalc.png')))
 
     window = MainWindow()
     window.show()
