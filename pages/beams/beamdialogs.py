@@ -1,5 +1,6 @@
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, QFrame, QDialogButtonBox,
+from PyQt6.QtWidgets import (QMessageBox, QWidget, QVBoxLayout, QLabel, QComboBox, QFrame, QDialogButtonBox,
                              QLineEdit, QHBoxLayout, QFormLayout, QPushButton, QDialog, QButtonGroup)
+from numpy import ma
 
 from pages.pagestyling import set_dropdown_style, set_lineEdit_style, setLabelStyle, setButtonStyle
 from units.unit_factors import beam_dropdown_units
@@ -67,9 +68,10 @@ class pinnedSupportDialogue(QDialog):
 
 
 class rollerSupportDialogue(QDialog):
-    def __init__(self, unit_system):
+    def __init__(self, unit_system, beam_model):
         super().__init__()
         self.unit_system = unit_system
+        self.beam_model = beam_model
         self.setWindowTitle("Add Roller Support")
         self.setGeometry(300,300,600,400)
         self.setupUI()
@@ -108,11 +110,30 @@ class rollerSupportDialogue(QDialog):
         main_layout.addWidget(buttons)
         self.setLayout(main_layout)
 
+    def accept(self):
+        print("DEBUG: accept called")
+        text = self.roller_support_location_input.text()
+        if not text:
+            # Show error message or just return
+            print("Error: Location input is required.")
+            return
+        try:
+            x_pos = float(text)
+        except ValueError:
+            print("Error: Location must be a number.")
+            return
+
+        support_type = "roller"
+        new_node_idx = self.beam_model.insert_node_at_position(x_pos)
+        self.beam_model.add_support(new_node_idx, support_type)
+        super().accept()
+
 
 class fixedSupportDialogue(QDialog):
-    def __init__(self, unit_system):
+    def __init__(self, unit_system, beam_model):
         super().__init__()
         self.unit_system = unit_system
+        self.beam_model = beam_model
         self.setWindowTitle("Add Fixed Support")
         self.setGeometry(300,300,600,400)
         self.setupUI()
@@ -139,8 +160,8 @@ class fixedSupportDialogue(QDialog):
         #button group
         self.fixed_btn_group = QButtonGroup(self)
         self.fixed_btn_group.setExclusive(True)
-        self.fixed_btn_group.addButton(left_position_btn)
-        self.fixed_btn_group.addButton(right_position_btn)
+        self.fixed_btn_group.addButton(left_position_btn, 0)
+        self.fixed_btn_group.addButton(right_position_btn, 1)
 
 
         buttons = QDialogButtonBox(
@@ -157,11 +178,29 @@ class fixedSupportDialogue(QDialog):
         main_layout.addWidget(buttons)
         self.setLayout(main_layout)
 
+    def accept(self):
+        checked_id = self.fixed_btn_group.checkedId()
+        if checked_id == 0: #left
+            x_pos = 0.0
+        elif checked_id == 1: #right
+            x_pos = self.beam_model.length
+        else:
+            QMessageBox.critical(self,"Selection Error", "Must select LEFT or RIGHT")
+            return
+
+        
+        
+        support_type = "fixed"
+        node_index = self.beam_model.insert_node_at_position(x_pos)
+        self.beam_model.add_support(node_index, support_type)
+        super().accept()
+
 
 class addPointLoadDialogue(QDialog):
-    def __init__(self, unit_system):
+    def __init__(self, unit_system, beam_model):
         super().__init__()
         self.unit_system = unit_system
+        self.beam_model = beam_model
         self.setWindowTitle("Add Point Load")
         self.setGeometry(300,300,600,400)
         self.setupUI()
@@ -225,10 +264,35 @@ class addPointLoadDialogue(QDialog):
         main_layout.addWidget(buttons)
         self.setLayout(main_layout)
 
+    def accept(self):
+        print("DEBUG: accept called")
+        location_text = self.pointload_location_input.text()
+        magnitude_text = self.pointload_mag_input.text()
+        if not location_text:
+            # Show error message or just return
+            print("Error: Location input is required.")
+            return
+        if not magnitude_text:
+            # Show error message or just return
+            print("Error: Magnitude input is required.")
+            return
+        try:
+            x_pos = float(location_text)
+            magnitude = float(magnitude_text)
+        except ValueError:
+            print("Error: Location and Magnitude must be a number.")
+            return
+
+        
+        new_node_idx = self.beam_model.insert_node_at_position(x_pos)
+        self.beam_model.add_point_load(new_node_idx, magnitude, moment=False)
+        super().accept()
+
 class addMomentLoadDialogue(QDialog):
-    def __init__(self, unit_system):
+    def __init__(self, unit_system, beam_model):
         super().__init__()        
         self.unit_system = unit_system
+        self.beam_model = beam_model
         self.setWindowTitle("Add Moment Load")
         self.setGeometry(300,300,600,400)
         self.setupUI()
@@ -292,10 +356,35 @@ class addMomentLoadDialogue(QDialog):
         main_layout.addWidget(buttons)
         self.setLayout(main_layout)
 
+    def accept(self):
+        print("DEBUG: accept called")
+        location_text = self.moment_location_input.text()
+        magnitude_text = self.moment_mag_input.text()
+        if not location_text:
+            # Show error message or just return
+            print("Error: Location input is required.")
+            return
+        if not magnitude_text:
+            # Show error message or just return
+            print("Error: Magnitude input is required.")
+            return
+        try:
+            x_pos = float(location_text)
+            magnitude = float(magnitude_text)
+        except ValueError:
+            print("Error: Location and Magnitude must be a number.")
+            return
+
+        
+        new_node_idx = self.beam_model.insert_node_at_position(x_pos)
+        self.beam_model.add_point_load(new_node_idx, magnitude, moment=True)
+        super().accept()
+
 class addDistLoadDialogue(QDialog):
-    def __init__(self, unit_system):
+    def __init__(self, unit_system, beam_model):
         super().__init__()
         self.unit_system = unit_system
+        self.beam_model = beam_model
 
         self.setWindowTitle("Add Distributed Load")
         self.setGeometry(300,300,600,400)
@@ -387,3 +476,38 @@ class addDistLoadDialogue(QDialog):
         main_layout.addLayout(end_magnitude_layout)
         main_layout.addWidget(buttons)
         self.setLayout(main_layout)
+
+    def accept(self):
+        #user input 
+        start_location = float(self.start_location_input.text())
+        end_location = float(self.end_location_input.text())
+        w0 = float(self.start_mag_input.text())
+        wL = float(self.end_mag_input.text())
+
+        node_positions = self.beam_model.get_node_positions()
+
+        #insert nodes 
+        start_node_idx = self.beam_model.insert_node_at_position(start_location)
+        end_node_idx = self.beam_model.insert_node_at_position(end_location)
+
+        #find elements between start_node_idx and end_node_idx (left to right)
+        for elem in self.beam_model.elements:
+            n_start = elem.node_start.index
+            n_end = elem.node_end.index
+
+            if n_start >= start_node_idx and n_end <= end_node_idx:
+                # Calculate the physical positions of the element's start and end nodes
+                x_elem_start = node_positions[n_start]
+                x_elem_end = node_positions[n_end]
+
+                # Interpolate w0 and wL for the current element
+                w0_elem = interpolate_w(x_elem_start, start_location, end_location, w0, wL)
+                wL_elem = interpolate_w(x_elem_end, start_location, end_location, w0, wL)
+
+                self.beam_model.add_distributed_load(elem.index, w0_elem, wL_elem)
+
+        super().accept()
+
+def interpolate_w(x, x0, x1, w0, w1):
+    """Linearly interpolate load value at position x between x0 and x1."""
+    return w0 + (w1 - w0) * (x - x0) / (x1 - x0)

@@ -150,7 +150,11 @@ def setLabelStyle(widget):
 
         }
         QLabel#modelheader {
-            font-size: 17px;
+            font-size: 20px;
+        }
+
+        QLabel#add_label {
+            font-size: 20px;
         }
 
 
@@ -215,5 +219,54 @@ def setButtonStyle(widget):
             border: 1px solid white;
         }
 
+        QPushButton#point_load_btn {
+            background-color: #ff8c00;
+        }
+        QPushButton#point_load_btn:hover {
+            background-color: #ff8c00;
+            border: 1px solid white;
+        }
+
+        QPushButton#moment_load_btn {
+            background-color: #ff8c00;
+        }
+        QPushButton#moment_load_btn:hover {
+            background-color: #ff8c00;
+            border: 1px solid white;
+        }
+
+
+        QPushButton#distributed_load_btn {
+            background-color: #ff8c00;
+        }
+        QPushButton#distributed_load_btn:hover {
+            background-color: #ff8c00;
+            border: 1px solid white;
+        }
+
 """
     widget.setStyleSheet(button_style)
+def set_table_style(widget):
+    tablestyle = """
+        QTableWidget {
+                background-color: #454545;
+                color: #f8f9fa;
+                gridline-color: #cccccc;
+                border: none;
+                font-size: 18px;
+            }
+            QHeaderView::section {
+                background-color: #454545;
+                color: #f8f9fa;
+                font-size: 20px;
+                border: 1px solid #ff8c00;
+            }
+            QTableWidget::item {
+                color: #f8f9fa;
+                font-size: 18px;
+                padding: 8px;
+            }
+    
+    
+    """
+    widget.setStyleSheet(tablestyle)

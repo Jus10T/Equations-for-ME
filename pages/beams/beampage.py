@@ -1,14 +1,14 @@
 import numpy as np
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, QFrame, QDialogButtonBox,
                              QLineEdit, QHBoxLayout, QFormLayout, QPushButton, QDialog, QButtonGroup,
-                             QTableWidget, QTableWidgetItem)
+                             QTableWidget, QTableWidgetItem, QHeaderView)
 from PyQt6.QtGui import QPainter, QPen, QBrush, QColor, QPolygonF, QIcon, QPixmap
 
 from PyQt6.QtCore import Qt, QPointF, QRectF, pyqtSignal, QSize
 
 
 
-from pages.pagestyling import set_dropdown_style, set_lineEdit_style, setLabelStyle, setButtonStyle
+from pages.pagestyling import set_dropdown_style, set_lineEdit_style, setLabelStyle, setButtonStyle, set_table_style
 from units.unit_factors import (beam_dropdown_units)
 from .beamdialogs import (pinnedSupportDialogue, rollerSupportDialogue, fixedSupportDialogue,
                                     addPointLoadDialogue, addMomentLoadDialogue, addDistLoadDialogue)
@@ -38,6 +38,9 @@ class BeamPage(QWidget):
         #info H layout (input + table)
         self.info_layout = QHBoxLayout()
 
+        #table layout
+        self.table_layout = QVBoxLayout()
+
 
         #input layout
         input_layout = QVBoxLayout()
@@ -50,6 +53,14 @@ class BeamPage(QWidget):
         model_header = QLabel("Beam Model:")
         model_header.setObjectName("modelheader")
         setLabelStyle(model_header)
+
+        # Add horizontal line under the "Beam Model:" label
+        add_separator1 = QFrame()
+        add_separator1.setFrameShape(QFrame.Shape.HLine)
+        add_separator1.setFrameShadow(QFrame.Shadow.Sunken)
+        add_separator1.setMaximumHeight(1)
+        add_separator1.setMaximumWidth(500)
+        add_separator1.setStyleSheet("background-color: #cccccc;")
 
 
         #length
@@ -130,8 +141,9 @@ class BeamPage(QWidget):
         self.make_beam.clicked.connect(self.create_beam_model)
 
         #add to form
-        model_setup_layout.addStretch(stretch=2)
+        model_setup_layout.addStretch(stretch=1)
         model_setup_layout.addWidget(model_header)
+        model_setup_layout.addWidget(add_separator1)
         model_setup_layout.addLayout(length_layout)
         model_setup_layout.addLayout(modulus_layout)
         model_setup_layout.addLayout(inertia_layout)
@@ -153,7 +165,6 @@ class BeamPage(QWidget):
         #load layout
         load_layout = QHBoxLayout()
 
-
         add_label = QLabel("Add:")
         setLabelStyle(add_label)
         add_label.setObjectName("add_label")
@@ -162,7 +173,8 @@ class BeamPage(QWidget):
         add_separator = QFrame()
         add_separator.setFrameShape(QFrame.Shape.HLine)
         add_separator.setFrameShadow(QFrame.Shadow.Sunken)
-        add_separator.setMaximumHeight(2)
+        add_separator.setMaximumHeight(1)
+        add_separator.setMaximumWidth(500)
         add_separator.setStyleSheet("background-color: #cccccc;")
 
         supports_label = QLabel("Supports:")
@@ -174,8 +186,8 @@ class BeamPage(QWidget):
         add_pinned_btn.setObjectName("pinned_support_btn")
         setButtonStyle(add_pinned_btn)
         add_pinned_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/pinnedicon.png")))
-        add_pinned_btn.setIconSize(QSize(60, 60))
-        add_pinned_btn.setMaximumWidth(200)
+        add_pinned_btn.setIconSize(QSize(40, 40))
+        add_pinned_btn.setMinimumWidth(150)
         add_pinned_btn.clicked.connect(self.open_pinned_support_dialog)
 
 
@@ -183,8 +195,8 @@ class BeamPage(QWidget):
         add_roller_btn.setObjectName("roller_support_btn")
         setButtonStyle(add_roller_btn)
         add_roller_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/rollericon.png")))
-        add_roller_btn.setIconSize(QSize(60, 60))
-        add_roller_btn.setMaximumWidth(200)
+        add_roller_btn.setIconSize(QSize(40, 40))
+        add_roller_btn.setMinimumWidth(150)
         add_roller_btn.clicked.connect(self.open_roller_support_dialog)
 
 
@@ -192,8 +204,8 @@ class BeamPage(QWidget):
         add_fixed_btn.setObjectName("fixed_support_btn")
         setButtonStyle(add_fixed_btn)
         add_fixed_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/fixedicon.png")))
-        add_fixed_btn.setIconSize(QSize(60, 60))
-        add_fixed_btn.setMaximumWidth(200)
+        add_fixed_btn.setIconSize(QSize(40, 40))
+        add_fixed_btn.setMinimumWidth(150)
         add_fixed_btn.clicked.connect(self.open_fixed_support_dialog)
 
         loads_label = QLabel("Loads:")
@@ -201,35 +213,46 @@ class BeamPage(QWidget):
         loads_label.setObjectName("loads_label")
 
 
-        add_point_btn = QPushButton("point load")
+        add_point_btn = QPushButton()
         add_point_btn.setObjectName("point_load_btn")
         setButtonStyle(add_point_btn)
-        add_point_btn.setMaximumWidth(200)
+        add_point_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/pointloadicon.png")))
+        add_point_btn.setIconSize(QSize(40, 30))
+        add_point_btn.setMinimumWidth(150)
         add_point_btn.clicked.connect(self.open_pointload_dialog)
 
 
-        add_moment_btn = QPushButton("moment load")
+        add_moment_btn = QPushButton()
         add_moment_btn.setObjectName("moment_load_btn")
         setButtonStyle(add_moment_btn)
-        add_moment_btn.setMaximumWidth(200)
+        add_moment_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/momentloadicon.png")))
+        add_moment_btn.setIconSize(QSize(40, 30))
+        add_moment_btn.setMinimumWidth(150)
         add_moment_btn.clicked.connect(self.open_momentload_dialog)
 
 
-        add_dist_btn = QPushButton("distributed load")
+        add_dist_btn = QPushButton()
         add_dist_btn.setObjectName("distributed_load_btn")
         setButtonStyle(add_dist_btn)
-        add_dist_btn.setMaximumWidth(200)
+        add_dist_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/distloadicon.png")))
+        add_dist_btn.setIconSize(QSize(40, 30))
+        add_dist_btn.setMinimumWidth(150)
         add_dist_btn.clicked.connect(self.open_distload_dialog)
 
         #add to support layout
         support_layout.addWidget(add_pinned_btn)
         support_layout.addWidget(add_roller_btn)
         support_layout.addWidget(add_fixed_btn)
+        support_layout.addStretch()
+        support_layout.setSpacing(20)
+
 
         #add to load layout
         load_layout.addWidget(add_point_btn)
         load_layout.addWidget(add_moment_btn)
         load_layout.addWidget(add_dist_btn)
+        load_layout.addStretch()
+        load_layout.setSpacing(20)
 
         #add to button layout
         buttons_vlayout.addWidget(add_label)
@@ -238,6 +261,7 @@ class BeamPage(QWidget):
         buttons_vlayout.addLayout(support_layout)
         buttons_vlayout.addWidget(loads_label)
         buttons_vlayout.addLayout(load_layout)
+        buttons_vlayout.setSpacing(2)  # Set spacing between objects to 2px
 
         #add to input layout
         input_layout.addLayout(model_setup_layout)
@@ -245,6 +269,7 @@ class BeamPage(QWidget):
 
         #add to info layout
         self.info_layout.addLayout(input_layout)
+        self.info_layout.addLayout(self.table_layout)
 
 
         #add to page
@@ -274,63 +299,55 @@ class BeamPage(QWidget):
 
     def open_roller_support_dialog(self):
         unit_system = self.beam_unit_drop.currentText()
-
-        dialog = rollerSupportDialogue(unit_system)
-        dialog.setupUI()
+        dialog = rollerSupportDialogue(unit_system, self.beam_model)
         dialog.exec()
+        self.make_beam_table()
 
     def open_fixed_support_dialog(self):
         unit_system = self.beam_unit_drop.currentText()
-
-        dialog = fixedSupportDialogue(unit_system)
-        dialog.setupUI()
+        dialog = fixedSupportDialogue(unit_system, self.beam_model)
         dialog.exec()
+        self.make_beam_table()
 
     def open_pointload_dialog(self):
         unit_system = self.beam_unit_drop.currentText()
 
-        dialog = addPointLoadDialogue(unit_system)
-        dialog.setupUI()
+        dialog = addPointLoadDialogue(unit_system, self.beam_model)  
         dialog.exec()
+        self.make_beam_table()  
 
     def open_momentload_dialog(self):
         unit_system = self.beam_unit_drop.currentText()
 
-        dialog = addMomentLoadDialogue(unit_system)
-        dialog.setupUI()
+        dialog = addMomentLoadDialogue(unit_system, self.beam_model)
         dialog.exec()
+        self.make_beam_table()
 
     def open_distload_dialog(self):
         unit_system = self.beam_unit_drop.currentText()
 
-        dialog = addDistLoadDialogue(unit_system)
-        dialog.setupUI()
+        dialog = addDistLoadDialogue(unit_system, self.beam_model)
         dialog.exec()
+        self.make_beam_table()
 
     def create_empty_beam_table(self):
         """Create an empty beam table that shows when the page loads"""
         self.beam_table = QTableWidget()
         self.beam_table.setColumnCount(4)
-        self.beam_table.setHorizontalHeaderLabels(['Location', 'Support', 'Load', 'Magnitude'])
+        self.beam_table.setHorizontalHeaderLabels(['Location', 'Magnitude', 'Support', 'Load'])
         self.beam_table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.beam_table.setRowCount(0)  # Start with no rows
-        self.beam_table.setMinimumHeight(100)  # Give it some minimum height
-        self.beam_table.setStyleSheet("""
-            QTableWidget {
-                background-color: #f8f9fa;
-                gridline-color: #dee2e6;
-                border: 1px solid #dee2e6;
-            }
-            QTableWidget::item {
-                padding: 5px;
-            }
-        """)
-        self.info_layout.addWidget(self.beam_table)
+        self.beam_table.setMaximumHeight(800) 
+        self.beam_table.setMinimumWidth(700)
+        self.beam_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        set_table_style(self.beam_table)
+
+        self.table_layout.addWidget(self.beam_table)
+
 
     def make_beam_table(self):
         """Update the beam table with current beam model data"""
-        # Clear existing table data
-        self.beam_table.setRowCount(0)
+        
         
         if not hasattr(self, 'beam_model'):
             return
@@ -343,7 +360,7 @@ class BeamPage(QWidget):
         # Supports
         for node_idx, support_type in self.beam_model.supports.items():
             location = node_positions[node_idx] if node_idx < len(node_positions) else "?"
-            rows.append([f"{location:.2f}", support_type, "", ""])
+            rows.append([f"{location:.2f}", "", support_type, ""])  # Magnitude is blank, support type in 3rd col
 
         # Point Loads and Moments
         for dof_idx, value in self.beam_model.point_loads.items():
@@ -351,20 +368,58 @@ class BeamPage(QWidget):
             is_moment = (dof_idx % 2 == 1)
             location = node_positions[node_idx] if node_idx < len(node_positions) else "?"
             load_type = "Moment" if is_moment else "Point Load"
-            rows.append([f"{location:.2f}", "", load_type, f"{value:.2f}"])
+            rows.append([f"{location:.2f}", f"{value:.2f}", "", load_type])  # Magnitude in 2nd col, load type in 4th
 
-        # Distributed Loads
-        for elem_idx, (w0, wL) in self.beam_model.distributed_loads.items():
-            elem = self.beam_model.elements[elem_idx]
-            x_start = node_positions[elem.node_start.index]
-            x_end = node_positions[elem.node_end.index]
-            location = f"{x_start:.2f} - {x_end:.2f}"
-            rows.append([location, "", "Distributed Load", f"{w0:.2f} to {wL:.2f}"])
+        # Distributed Loads (grouped)
+        dist_loads = self.beam_model.distributed_loads
+        elements = self.beam_model.elements
+        node_positions = self.beam_model.get_node_positions()
+
+        # Sort element indices for proper grouping
+        sorted_elem_indices = sorted(dist_loads.keys())
+
+        grouped = []
+        if sorted_elem_indices:
+            # Start first group
+            group_start = sorted_elem_indices[0]
+            group_end = group_start
+            w0_group, _ = dist_loads[group_start]
+            _, wL_prev = dist_loads[group_start]
+
+            for idx in sorted_elem_indices[1:]:
+                w0, wL = dist_loads[idx]
+                # Check if this element is contiguous and load is compatible
+                if idx == group_end + 1 and abs(w0 - wL_prev) < 1e-8:
+                    # Continue group
+                    group_end = idx
+                    wL_prev = wL
+                else:
+                    # Finish previous group
+                    grouped.append((group_start, group_end, w0_group, wL_prev))
+                    # Start new group
+                    group_start = idx
+                    group_end = idx
+                    w0_group = w0
+                    wL_prev = wL
+            # Add last group
+            grouped.append((group_start, group_end, w0_group, wL_prev))
+
+            # Add to table
+            for group_start, group_end, w0, wL in grouped:
+                elem_start = elements[group_start]
+                elem_end = elements[group_end]
+                x_start = node_positions[elem_start.node_start.index]
+                x_end = node_positions[elem_end.node_end.index]
+                location = f"[{x_start:.2f} | {x_end:.2f}]"
+                magnitude = f"[{w0:.2f} | {wL:.2f}]"
+                rows.append([location, magnitude, "", "Distributed Load"])
 
         self.beam_table.setRowCount(len(rows))
         for row_idx, row_data in enumerate(rows):
             for col_idx, value in enumerate(row_data):
                 self.beam_table.setItem(row_idx, col_idx, QTableWidgetItem(str(value)))
+
+        
 
     
     def create_beam_model(self):
