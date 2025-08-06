@@ -44,7 +44,7 @@ class BeamPage(QWidget):
         self.beam_table_header = QLabel("NO ACTIVE BEAMS")
         setLabelStyle(self.beam_table_header)
         self.beam_table_header.setObjectName("beam_table_header")
-        self.table_layout.addWidget(self.beam_table_header)
+        #self.table_layout.addWidget(self.beam_table_header)
 
 
         #input layout
@@ -299,6 +299,39 @@ class BeamPage(QWidget):
         # Initialize empty beam table
         self.create_empty_beam_table()
 
+        #below table
+        model_buttons_layout = QHBoxLayout()
+
+        #RUN BUTTON
+        self.run_btn = QPushButton("RUN")
+        setButtonStyle(self.run_btn)
+        model_buttons_layout.addWidget(self.run_btn)
+        self.run_btn.clicked.connect(self.run_analysis)
+
+        #clear button
+        self.clear_button = QPushButton("CLEAR")
+        setButtonStyle(self.clear_button)
+        model_buttons_layout.addWidget(self.clear_button)
+
+        #add to table layout
+        self.table_layout.addWidget(self.beam_table_header)
+        self.table_layout.addWidget(self.beam_table)
+        self.table_layout.addLayout(model_buttons_layout)
+     
+
+    def run_analysis(self):
+        """Assembles the model, applies boundary conditions, solves, and prints results."""
+        if not hasattr(self, 'beam_model') or self.beam_model is None:
+            print("Cannot run analysis: Beam model not created yet.")
+            return
+
+        print("--- Running Beam Analysis ---")
+        self.beam_model.assemble()
+        self.beam_model.apply_boundary_conditions()
+        self.beam_model.solve()
+        self.beam_model.print_results()
+        print("--- Analysis Complete ---")
+
     def update_beam_labels(self, system):
         units = beam_dropdown_units[system]
         length_unit = list(units['Length'].values())[0]
@@ -359,7 +392,7 @@ class BeamPage(QWidget):
         self.beam_table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         set_table_style(self.beam_table)
 
-        self.table_layout.addWidget(self.beam_table)
+        #self.table_layout.addWidget(self.beam_table)
 
 
     def make_beam_table(self):
@@ -592,7 +625,9 @@ class BeamModel:
 
     def add_point_load(self, node_index, value, moment=False):
         dof = 2 * node_index + (1 if moment else 0)
-        self.point_loads[dof] = self.point_loads.get(dof, 0) + value
+        # Apply negative for downward force convention
+        load_value = -value if not moment else value
+        self.point_loads[dof] = self.point_loads.get(dof, 0) + load_value
 
     def add_moment_load(self, node_index, moment_value):
         self.add_point_load(node_index, moment_value, moment=True)
@@ -635,13 +670,46 @@ class BeamModel:
 
     def print_results(self):
         print("Nodal Displacements:")
+        node_positions = self.get_node_positions()
         for i in range(len(self.nodes)):
+            x_pos = node_positions[i]
             v = self.d[2*i]
             theta = self.d[2*i+1]
-            print(f"Node {i}: v = {v:.6e}, θ = {theta:.6e}")
+            print(f"Node {i} (x={x_pos:.2f}): v = {v:.6e}, θ = {theta:.6e}")
         print("\nSupport Reactions:")
         for i in self.prescribed_dofs:
-            print(f"DOF {i}: R = {self.reactions[i]:.2f}")
+            # Determine if it's a force or moment reaction for clearer output
+            node_idx = i // 2
+            x_pos = node_positions[node_idx]
+            if i % 2 == 0:
+                # Vertical force reaction
+                print(f"Reaction Force at Node {node_idx} (x={x_pos:.2f}): R = {self.reactions[i]:.2f}")
+            else:
+                # Moment reaction
+                print(f"Reaction Moment at Node {node_idx} (x={x_pos:.2f}): M = {self.reactions[i]:.2f}")
+
+    def calculate_shear_and_moment(self):
+        """Calculates shear and moment at each node using element-level results."""
+        num_nodes = len(self.nodes)
+        shear = np.zeros(num_nodes)
+        moment = np.zeros(num_nodes)
+
+        for i, elem in enumerate(self.elements):
+            dof_map = elem.dof_map()
+            d_elem = self.d[dof_map]
+            k_local = elem.stiffness_matrix()
+            w0, wL = self.distributed_loads.get(i, (0, 0))
+            f_load_local = elem.distributed_load_vector(w0, wL)
+            f_elem = k_local @ d_elem - f_load_local
+
+            if i == 0:
+                shear[i] = f_elem[0]
+                moment[i] = f_elem[1]
+
+            shear[i+1] = -f_elem[2]
+            moment[i+1] = f_elem[3]
+            
+        return shear, moment
 
 
 class Node:
@@ -673,11 +741,11 @@ class BeamElement:
     
     def distributed_load_vector(self, w0, wL):
         L = self.L
-        return (L / 20) * np.array([
-            7*w0 + 3*wL,
-            L*(3*w0 + 2*wL)/12,
-            3*w0 + 7*wL,
-            -L*(2*w0 + 3*wL)/12
+        return np.array([
+            (L/20) * (7*w0 + 3*wL),
+            (L**2/60) * (3*w0 + 2*wL),
+            (L/20) * (3*w0 + 7*wL),
+            -(L**2/60) * (2*w0 + 3*wL)
         ])
 
 
