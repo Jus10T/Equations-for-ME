@@ -41,6 +41,11 @@ class BeamPage(QWidget):
         #table layout
         self.table_layout = QVBoxLayout()
 
+        self.beam_table_header = QLabel("NO ACTIVE BEAMS")
+        setLabelStyle(self.beam_table_header)
+        self.beam_table_header.setObjectName("beam_table_header")
+        self.table_layout.addWidget(self.beam_table_header)
+
 
         #input layout
         input_layout = QVBoxLayout()
@@ -187,6 +192,7 @@ class BeamPage(QWidget):
         setButtonStyle(add_pinned_btn)
         add_pinned_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/pinnedicon.png")))
         add_pinned_btn.setIconSize(QSize(40, 40))
+        add_pinned_btn.setMaximumWidth(150)
         add_pinned_btn.setMinimumWidth(150)
         add_pinned_btn.clicked.connect(self.open_pinned_support_dialog)
 
@@ -196,7 +202,9 @@ class BeamPage(QWidget):
         setButtonStyle(add_roller_btn)
         add_roller_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/rollericon.png")))
         add_roller_btn.setIconSize(QSize(40, 40))
+        add_roller_btn.setMaximumWidth(150)
         add_roller_btn.setMinimumWidth(150)
+
         add_roller_btn.clicked.connect(self.open_roller_support_dialog)
 
 
@@ -205,6 +213,7 @@ class BeamPage(QWidget):
         setButtonStyle(add_fixed_btn)
         add_fixed_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/fixedicon.png")))
         add_fixed_btn.setIconSize(QSize(40, 40))
+        add_fixed_btn.setMaximumWidth(150)
         add_fixed_btn.setMinimumWidth(150)
         add_fixed_btn.clicked.connect(self.open_fixed_support_dialog)
 
@@ -218,7 +227,9 @@ class BeamPage(QWidget):
         setButtonStyle(add_point_btn)
         add_point_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/pointloadicon.png")))
         add_point_btn.setIconSize(QSize(40, 30))
+        add_point_btn.setMaximumWidth(150)
         add_point_btn.setMinimumWidth(150)
+
         add_point_btn.clicked.connect(self.open_pointload_dialog)
 
 
@@ -227,7 +238,9 @@ class BeamPage(QWidget):
         setButtonStyle(add_moment_btn)
         add_moment_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/momentloadicon.png")))
         add_moment_btn.setIconSize(QSize(40, 30))
+        add_moment_btn.setMaximumWidth(150)
         add_moment_btn.setMinimumWidth(150)
+
         add_moment_btn.clicked.connect(self.open_momentload_dialog)
 
 
@@ -236,14 +249,16 @@ class BeamPage(QWidget):
         setButtonStyle(add_dist_btn)
         add_dist_btn.setIcon(QIcon(QPixmap("Equations-for-ME/icons/distloadicon.png")))
         add_dist_btn.setIconSize(QSize(40, 30))
+        add_dist_btn.setMaximumWidth(150)
         add_dist_btn.setMinimumWidth(150)
+
         add_dist_btn.clicked.connect(self.open_distload_dialog)
 
         #add to support layout
         support_layout.addWidget(add_pinned_btn)
         support_layout.addWidget(add_roller_btn)
         support_layout.addWidget(add_fixed_btn)
-        support_layout.addStretch()
+        support_layout.addStretch(stretch=1)
         support_layout.setSpacing(20)
 
 
@@ -251,7 +266,7 @@ class BeamPage(QWidget):
         load_layout.addWidget(add_point_btn)
         load_layout.addWidget(add_moment_btn)
         load_layout.addWidget(add_dist_btn)
-        load_layout.addStretch()
+        load_layout.addStretch(stretch=1)
         load_layout.setSpacing(20)
 
         #add to button layout
@@ -261,6 +276,7 @@ class BeamPage(QWidget):
         buttons_vlayout.addLayout(support_layout)
         buttons_vlayout.addWidget(loads_label)
         buttons_vlayout.addLayout(load_layout)
+        buttons_vlayout.addSpacing(50)
         buttons_vlayout.setSpacing(2)  # Set spacing between objects to 2px
 
         #add to input layout
@@ -270,6 +286,7 @@ class BeamPage(QWidget):
         #add to info layout
         self.info_layout.addLayout(input_layout)
         self.info_layout.addLayout(self.table_layout)
+        self.info_layout.addSpacing(75)
 
 
         #add to page
@@ -473,7 +490,15 @@ class BeamPage(QWidget):
 
         self.beam_model = BeamModel(length, num_elements, EI, unit_sys)
         self.make_beam_table()
+        self.update_beam_table_header()
         print(f"Beam model created with {num_elements} elements!")
+
+    def update_beam_table_header(self):
+        length_unit = list(beam_dropdown_units[self.beam_unit_drop.currentText()]['Length'].values())[0]
+        if self.beam_model is None:
+            self.beam_table_header.setText("NO ACTIVE BEAMS")
+        else:
+            self.beam_table_header.setText(f"BEAM MODEL IS {self.beam_model.length} [{length_unit}] LONG")
 
     
 

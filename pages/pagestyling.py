@@ -157,6 +157,10 @@ def setLabelStyle(widget):
             font-size: 20px;
         }
 
+        QLabel#beam_table_header {
+            font-size: 20px;
+        }
+
 
 """
     widget.setStyleSheet(label_style)

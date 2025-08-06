@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QHBoxLayout, QFrame, QSplitter,
                              QStackedWidget, QLabel, QPushButton)
 
-from pages.thermopage import ThermoPage
+from pages.thermo.thermopage import ThermoPage
 from pages.unitspage import UnitSolverPage
 from pages.beams.beampage import BeamPage
 
