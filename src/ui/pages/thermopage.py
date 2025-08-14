@@ -4,8 +4,8 @@ from PyQt6.QtWidgets import QComboBox, QWidget, QVBoxLayout, QPushButton, QHBoxL
 from PyQt6.QtPdf import QPdfDocument
 from PyQt6.QtPdfWidgets import QPdfView
 
-from units.unit_factors import beam_dropdown_units
-from pages.pagestyling import set_dropdown_style
+from src.core.calculations.unit_factors import beam_dropdown_units
+from src.ui.style.pagestyling import set_dropdown_style
 
 class ThermoPage(QWidget):
     def __init__(self):
@@ -101,14 +101,18 @@ class ThermoPage(QWidget):
             pdf_file = self.pdf_map.get(table)
 
         if pdf_file:
-            pdf_dir = os.path.dirname(os.path.abspath(__file__))
-            pdf_path = os.path.join(pdf_dir, 'thermopdfs', pdf_file)
+            # Get the project root directory (3 levels up from this file)
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(current_dir)))
+            pdf_path = os.path.join(project_root, 'assets', 'pdfs', 'thermopdfs', pdf_file)
             if os.path.exists(pdf_path):
                 self.pdf_doc.load(pdf_path)
             else:
-                self.pdf_doc.load("")  # Clear if file not found
+                print(f"PDF file not found: {pdf_path}")
+                self.pdf_doc.close()  # Close document instead of loading empty string
         else:
-            self.pdf_doc.load("")  # Clear if no mapping
+            print(f"No PDF mapping found for table: {table}")
+            self.pdf_doc.close()  # Close document instead of loading empty string
 
 
         

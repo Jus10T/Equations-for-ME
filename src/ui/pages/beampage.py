@@ -8,9 +8,9 @@ from PyQt6.QtCore import Qt, QPointF, QRectF, pyqtSignal, QSize
 
 
 
-from pages.pagestyling import set_dropdown_style, set_lineEdit_style, setLabelStyle, setButtonStyle, set_table_style
-from units.unit_factors import (beam_dropdown_units)
-from .beamdialogs import (pinnedSupportDialogue, rollerSupportDialogue, fixedSupportDialogue,
+from src.ui.style.pagestyling import set_dropdown_style, set_lineEdit_style, setLabelStyle, setButtonStyle, set_table_style
+from src.core.calculations.unit_factors import (beam_dropdown_units)
+from src.ui.dialogs.beamdialogs import (pinnedSupportDialogue, rollerSupportDialogue, fixedSupportDialogue,
                                     addPointLoadDialogue, addMomentLoadDialogue, addDistLoadDialogue)
 
 class BeamPage(QWidget):

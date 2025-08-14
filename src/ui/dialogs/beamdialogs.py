@@ -2,8 +2,8 @@ from PyQt6.QtWidgets import (QMessageBox, QWidget, QVBoxLayout, QLabel, QComboBo
                              QLineEdit, QHBoxLayout, QFormLayout, QPushButton, QDialog, QButtonGroup)
 from numpy import ma
 
-from pages.pagestyling import set_dropdown_style, set_lineEdit_style, setLabelStyle, setButtonStyle
-from units.unit_factors import beam_dropdown_units
+from src.ui.style.pagestyling import set_dropdown_style, set_lineEdit_style, setLabelStyle, setButtonStyle
+from src.core.calculations.unit_factors import beam_dropdown_units
 
 class pinnedSupportDialogue(QDialog):
     def __init__(self, unit_system, beam_model):

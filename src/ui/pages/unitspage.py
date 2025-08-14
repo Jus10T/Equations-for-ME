@@ -3,8 +3,8 @@ from PyQt6.QtWidgets import ( QWidget, QVBoxLayout,
                              QFrame, QPushButton, QLineEdit)
 from PyQt6.QtGui import QDoubleValidator
 
-from pages.pagestyling import set_dropdown_style, set_lineEdit_style
-from units.unit_factors import (length_factors, area_factors, mass_factors,
+from src.ui.style.pagestyling import set_dropdown_style, set_lineEdit_style
+from src.core.calculations.unit_factors import (length_factors, area_factors, mass_factors,
                                 stress_factors, energy_factors, time_factors,
                                 unit_types_abrv)
 

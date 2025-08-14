@@ -274,3 +274,48 @@ def set_table_style(widget):
     
     """
     widget.setStyleSheet(tablestyle)
+
+def update_sidebar_styles(self, active_index, sidebuttons):
+        self.side_buttons = sidebuttons
+        for i, button in enumerate(self.side_buttons):
+            if i == active_index:
+                button.setStyleSheet(""" 
+                    QPushButton {
+                        padding: 10px;
+                        text-align: left;
+                        font-size: 15px;
+                        font-weight: oblique;
+                        background-color: #454545;
+
+
+                    }
+            
+
+
+                    QPushButton:hover {
+                        border: 1px solid #ff8c00;
+                        border-radius: 4px;
+
+                        }
+                """)
+            else:
+                button.setStyleSheet(""" 
+                    QPushButton {
+                        padding: 10px;
+                        text-align: left;
+                        font-size: 15px;
+                        font-weight: oblique;
+                        font-family: 'Segoe UI';
+                        color: white;
+                        border-radius: 4px;
+
+                        }
+            
+
+
+                    QPushButton:hover {
+                        border: 1px solid #ff8c00;
+                        border-radius: 4px;
+                        color: 'white';
+                        }
+                """)
