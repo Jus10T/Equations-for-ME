@@ -99,7 +99,7 @@ class MainWindow(QMainWindow):
 
         #heading pixmap
         sidebar_icon = QLabel()
-        sidebar_icon.setPixmap(QPixmap("Equations-for-ME/icons/gearcalc.ico"))
+        sidebar_icon.setPixmap(QPixmap("assets/icons/gearcalc.ico"))
 
         #add icon and text to horizontal
         sidebar_heading_layout.addWidget(sidebar_icon)
